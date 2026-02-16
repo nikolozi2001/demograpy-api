@@ -1,9 +1,10 @@
-
 const express = require("express");
 const router = express.Router();
 
-
 const lifedataController = require("../controllers/lifedata.controller");
+const regiondetailsController = require("../controllers/regiondetails.controller");
+const regionYearsController = require("../controllers/regionYears.controller");
+
 
 // Define routes with error handling
 const handleRoute = (controller, method) => {
@@ -21,6 +22,16 @@ const handleRoute = (controller, method) => {
 router.get(
   "/lifedata/by-year",
   handleRoute(lifedataController, "getLifeDataByYear"),
+);
+
+router.get(
+  "/regiondetails/by-year",
+  handleRoute(regiondetailsController, "getRegionDetailsByYear"),
+);
+
+router.get(
+  "/regionyears/by-year",
+  handleRoute(regionYearsController, "getRegionYearsByYear"),
 );
 
 module.exports = router;

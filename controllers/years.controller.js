@@ -94,11 +94,14 @@ exports.getAgeGroupsByYear = async (req, res) => {
       });
     }
 
-    // გააკეთე map უფრო მარტივი წასაკითხად
     const byGroup = Object.fromEntries(
       rows.map((r) => [
         r.age_group,
-        { total: r.total, male: r.male, female: r.female },
+        {
+          total: r.total,
+          male: r.male,
+          female: r.female,
+        },
       ]),
     );
 
@@ -111,30 +114,39 @@ exports.getAgeGroupsByYear = async (req, res) => {
     const working = byGroup["15-64"]?.total || 0;
     const over65 = byGroup["65+"]?.total || 0;
 
-    // % საერთო მოსახლეობიდან
     const pct = (v) => (totalAll ? +((v / totalAll) * 100).toFixed(2) : 0);
 
-    // dependency ratios (სურათში რომაა “დატვირთულობა”)
-    const ratio = (v) => (working ? +((v / working) * 100).toFixed(2) : 0);
+    const dependency = (v) => (working ? +((v / working) * 100).toFixed(2) : 0);
+
+    const sexRatio = (male, female) =>
+      female ? +((male / female) * 100).toFixed(2) : 0;
+
+    const inMillions = (v) => +(v / 1000000).toFixed(2);
 
     res.json({
       year: Number(year),
-      totals: { total: totalAll },
+      totals: { total: totalAll, million: inMillions(totalAll) },
       groups: {
         "65+": {
           ...byGroup["65+"],
           percent: pct(over65),
-          dependency: ratio(over65),
+          dependency: dependency(over65),
+          sex_ratio: sexRatio(byGroup["65+"]?.male, byGroup["65+"]?.female),
+          million: inMillions(over65),
         },
         "15-64": {
           ...byGroup["15-64"],
           percent: pct(working),
           dependency: 100.0,
-        }, // სურვილისამებრ
+          sex_ratio: sexRatio(byGroup["15-64"]?.male, byGroup["15-64"]?.female),
+          million: inMillions(working),
+        },
         "<15": {
           ...byGroup["<15"],
           percent: pct(under15),
-          dependency: ratio(under15),
+          dependency: dependency(under15),
+          sex_ratio: sexRatio(byGroup["<15"]?.male, byGroup["<15"]?.female),
+          million: inMillions(under15),
         },
       },
       dependency_total: working
@@ -142,18 +154,13 @@ exports.getAgeGroupsByYear = async (req, res) => {
         : 0,
     });
   } catch (err) {
-    console.error("Age groups query error:", {
-      message: err.message,
-      code: err.code,
-      year,
-    });
+    console.error("Age groups query error:", err);
     res.status(500).json({
       error: {
         message:
           process.env.NODE_ENV === "development"
             ? err.message
             : "Internal Server Error",
-        code: err.code,
         status: 500,
       },
     });

@@ -2,8 +2,9 @@
 
 This is a Node.js Express API for demographic data, using SQL Server as the backend database.
 
+
 ## Features
-- Fetch lifedata by year
+- Fetch lifedata, regiondetails, regionyears, yeardetails, and years by year
 - Modular route and controller structure
 - CORS enabled
 - Environment variable support via `.env`
@@ -38,10 +39,15 @@ This is a Node.js Express API for demographic data, using SQL Server as the back
    npm run dev
    ```
 
+
 ## API Endpoints
 
-- **GET** `/api/lifedata/by-year?year=YYYY`
-  - Returns lifedata for the specified year.
+- **GET** `/api/lifedata/by-year?year=YYYY` — Returns lifedata for the specified year.
+- **GET** `/api/regiondetails/by-year?year=YYYY` — Returns regiondetails for the specified year.
+- **GET** `/api/regionyears/by-year?year=YYYY` — Returns regionyears for the specified year.
+- **GET** `/api/yeardetails/by-year?year=YYYY` — Returns yeardetails for the specified year.
+- **GET** `/api/years/by-year?year=YYYY` — Returns years for the specified year.
+
 
 ## Project Structure
 ```
@@ -51,6 +57,10 @@ config/
   db.config.js
 controllers/
   lifedata.controller.js
+  regiondetails.controller.js
+  regionYears.controller.js
+  yearDetails.controller.js
+  years.controller.js
 routes/
   api.routes.js
   index.js

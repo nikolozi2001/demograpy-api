@@ -46,4 +46,6 @@ router.get(
   handleRoute(yearsController, "getYearsByYear"),
 );
 
+router.get("/years/age-groups", yearsController.getAgeGroupsByYear);
+
 module.exports = router;

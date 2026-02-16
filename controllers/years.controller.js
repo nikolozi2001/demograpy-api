@@ -14,10 +14,10 @@ exports.getYearsByYear = async (req, res) => {
     }
 
     const query = `
-            SELECT [Id], [year], [total], [male], [female], ,[median_total], 
+            SELECT [Id], [year], [total], [male], [female], [median_total], 
             [median_male], [median_female], [leo_total], [leo_male],   
             [leo_female], [tfr], [natinc], [migration]
-            FROM [pyramid].[pyramid].[yeardetails]
+            FROM [pyramid].[pyramid].[years]
             WHERE [year] = ?
         `;
 

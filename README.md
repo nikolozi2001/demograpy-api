@@ -43,8 +43,8 @@ This is a Node.js Express API for demographic data, using SQL Server as the back
 ## API Endpoints
 
 - **GET** `/api/lifedata/by-year?year=YYYY` — Returns lifedata for the specified year.
-- **GET** `/api/regiondetails/by-year?year=YYYY` — Returns regiondetails for the specified year.
-- **GET** `/api/regionyears/by-year?year=YYYY` — Returns regionyears for the specified year.
+- **GET** `/api/regiondetails/by-year?year=YYYY&region_code=CODE` — Returns regiondetails for the specified year and region_code.
+- **GET** `/api/regionyears/by-year?year=YYYY&region_code=CODE` — Returns regionyears for the specified year and region_code.
 - **GET** `/api/yeardetails/by-year?year=YYYY` — Returns yeardetails for the specified year.
 - **GET** `/api/years/by-year?year=YYYY` — Returns years for the specified year.
 

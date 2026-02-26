@@ -14,9 +14,9 @@ exports.getYearDetailsByYear = async (req, res) => {
     }
 
     const query = `
-            SELECT [Id], [yearId], [age], [total], [male], [female]
+            SELECT [Id], [year], [age], [total], [male], [female]
             FROM [pyramid].[pyramid].[yeardetails]
-            WHERE [yearId] = ?
+            WHERE [year] = ?
         `;
 
     console.log("Executing query:", query, "with year:", year);

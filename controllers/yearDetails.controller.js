@@ -52,3 +52,32 @@ exports.getYearDetailsByYear = async (req, res) => {
     });
   }
 };
+
+exports.getYears = async (req, res) => {
+  try {
+    const query = `SELECT DISTINCT [year] FROM [pyramid].[pyramid].[yeardetails] ORDER BY [year] ASC`;
+
+    const [results] = await db.query(query);
+
+    if (!results || results.length === 0) {
+      return res.json([]);
+    }
+
+    const years = results.map((row) => row.year);
+    res.json(years);
+  } catch (err) {
+    console.error("Query error details:", {
+      message: err.message,
+      code: err.code,
+    });
+    res.status(500).json({
+      error: {
+        message:
+          process.env.NODE_ENV === "development"
+            ? err.message
+            : "Internal Server Error",
+        status: 500,
+      },
+    });
+  }
+};

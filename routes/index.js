@@ -371,6 +371,32 @@ router.get("/", async (req, res) => {
             </div>
           </div>
 
+          <!-- Marriages -->
+          <div class="category">
+            <div class="category-header">
+              <span class="category-icon">💍</span>
+              <span>Marriages</span>
+              <span class="category-count">3 endpoints</span>
+            </div>
+            <div class="endpoints">
+              <div class="endpoint">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-path">/api/marriages?<span class="param">year</span></span>
+                <span class="endpoint-desc">Get marriage data by year (age groups & counts)</span>
+              </div>
+              <div class="endpoint">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-path">/api/marriages/total?<span class="param">year</span></span>
+                <span class="endpoint-desc">Get total marriage count for a year</span>
+              </div>
+              <div class="endpoint">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-path">/api/marriages/years</span>
+                <span class="endpoint-desc">Get list of all available years</span>
+              </div>
+            </div>
+          </div>
+
           <!-- System Endpoints -->
           <div class="category">
             <div class="category-header">

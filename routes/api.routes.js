@@ -6,6 +6,7 @@ const regiondetailsController = require("../controllers/regiondetails.controller
 const regionYearsController = require("../controllers/regionYears.controller");
 const yearDetailsController = require("../controllers/yearDetails.controller");
 const yearsController = require("../controllers/years.controller");
+const marriagesController = require("../controllers/marriages.controller");
 
 // Define routes with error handling
 const handleRoute = (controller, method) => {
@@ -53,5 +54,20 @@ router.get(
 router.get("/years/by-year", handleRoute(yearsController, "getYearsByYear"));
 
 router.get("/years/age-groups", yearsController.getAgeGroupsByYear);
+
+router.get(
+  "/marriages",
+  handleRoute(marriagesController, "getMarriagesByYear"),
+);
+
+router.get(
+  "/marriages/total",
+  handleRoute(marriagesController, "getTotalByYear"),
+);
+
+router.get(
+  "/marriages/years",
+  handleRoute(marriagesController, "getYears"),
+);
 
 module.exports = router;

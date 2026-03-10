@@ -77,7 +77,7 @@ router.get("/", async (req, res) => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>GeoMap API - Documentation</title>
+      <title>Demography API - Documentation</title>
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -236,8 +236,8 @@ router.get("/", async (req, res) => {
     <body>
       <div class="header">
         <div class="header-left">
-          <span class="logo">🗺️</span>
-          <h1>GeoMap API</h1>
+          <span class="logo">�</span>
+          <h1>Demography API</h1>
         </div>
         <span class="version">v1.0.0</span>
       </div>
@@ -276,214 +276,97 @@ router.get("/", async (req, res) => {
         <div class="section">
           <h2 class="section-title">📚 API Endpoints</h2>
           
-          <!-- Regional Data -->
+          <!-- Years (National) -->
           <div class="category">
             <div class="category-header">
-              <span class="category-icon">🏛️</span>
-              <span>Regional Statistics</span>
-              <span class="category-count">26 endpoints</span>
+              <span class="category-icon">📅</span>
+              <span>Years (National)</span>
+              <span class="category-count">2 endpoints</span>
             </div>
             <div class="endpoints">
               <div class="endpoint">
                 <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegBrunva</span>
-                <span class="endpoint-desc">Get all regional business turnover data</span>
+                <span class="endpoint-path">/api/years/by-year?<span class="param">year</span></span>
+                <span class="endpoint-desc">Get national summary data by year</span>
               </div>
               <div class="endpoint">
                 <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegBrunva/<span class="param">:region_id</span></span>
-                <span class="endpoint-desc">Get business turnover by region</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getPayGender</span>
-                <span class="endpoint-desc">Get all regional pay gender data</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegPayGender/<span class="param">:region_id</span></span>
-                <span class="endpoint-desc">Get pay gender data by region</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getValAdded</span>
-                <span class="endpoint-desc">Get all regional value added data</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegValAdded/<span class="param">:region_id</span></span>
-                <span class="endpoint-desc">Get value added by region</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegEmployees</span>
-                <span class="endpoint-desc">Get all regional employees data</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegEmployees/<span class="param">:region_id</span></span>
-                <span class="endpoint-desc">Get employees data by region</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegEmployeesGender</span>
-                <span class="endpoint-desc">Get regional employees by gender</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegEmployeesGender/<span class="param">:region_id</span></span>
-                <span class="endpoint-desc">Get employees by gender for region</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegEmployed</span>
-                <span class="endpoint-desc">Get all regional employed data</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegEmployed/<span class="param">:region_id</span></span>
-                <span class="endpoint-desc">Get employed data by region</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegResale</span>
-                <span class="endpoint-desc">Get all regional resale data</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegResale/<span class="param">:region_id</span></span>
-                <span class="endpoint-desc">Get resale data by region</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegInvestment</span>
-                <span class="endpoint-desc">Get all regional investment data</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegInvestment/<span class="param">:region_id</span></span>
-                <span class="endpoint-desc">Get investment data by region</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegProdVal</span>
-                <span class="endpoint-desc">Get all regional production value</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegProdVal/<span class="param">:region_id</span></span>
-                <span class="endpoint-desc">Get production value by region</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegPurchases</span>
-                <span class="endpoint-desc">Get all regional purchases data</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegPurchases/<span class="param">:region_id</span></span>
-                <span class="endpoint-desc">Get purchases data by region</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegRemuneration</span>
-                <span class="endpoint-desc">Get all regional remuneration data</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegRemuneration/<span class="param">:region_id</span></span>
-                <span class="endpoint-desc">Get remuneration data by region</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegCosts</span>
-                <span class="endpoint-desc">Get all regional costs data</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegCosts/<span class="param">:region_id</span></span>
-                <span class="endpoint-desc">Get costs data by region</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegIntConsumption</span>
-                <span class="endpoint-desc">Get regional intermediate consumption</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getRegIntConsumption/<span class="param">:region_id</span></span>
-                <span class="endpoint-desc">Get intermediate consumption by region</span>
+                <span class="endpoint-path">/api/years/age-groups?<span class="param">year</span></span>
+                <span class="endpoint-desc">Get national age group breakdown (&#60;15, 15-64, 65+)</span>
               </div>
             </div>
           </div>
 
-          <!-- Municipal Data -->
+          <!-- Year Details -->
           <div class="category">
             <div class="category-header">
-              <span class="category-icon">🏘️</span>
-              <span>Municipal Statistics</span>
-              <span class="category-count">12 endpoints</span>
+              <span class="category-icon">📊</span>
+              <span>Year Details</span>
+              <span class="category-count">2 endpoints</span>
             </div>
             <div class="endpoints">
               <div class="endpoint">
                 <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getMunBrunva</span>
-                <span class="endpoint-desc">Get all municipal business turnover</span>
+                <span class="endpoint-path">/api/yeardetails/by-year?<span class="param">year</span></span>
+                <span class="endpoint-desc">Get national per-age population data by year</span>
               </div>
               <div class="endpoint">
                 <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getMunValAdded</span>
-                <span class="endpoint-desc">Get all municipal value added data</span>
+                <span class="endpoint-path">/api/yeardetails/years</span>
+                <span class="endpoint-desc">Get list of all available years</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Region Years -->
+          <div class="category">
+            <div class="category-header">
+              <span class="category-icon">🏛️</span>
+              <span>Region Years</span>
+              <span class="category-count">2 endpoints</span>
+            </div>
+            <div class="endpoints">
+              <div class="endpoint">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-path">/api/regionyears?<span class="param">year</span>&amp;<span class="param">region_code</span></span>
+                <span class="endpoint-desc">Get regional summary data by year and region</span>
               </div>
               <div class="endpoint">
                 <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getMunPayGender</span>
-                <span class="endpoint-desc">Get municipal pay gender data</span>
+                <span class="endpoint-path">/api/regionyears/age-groups?<span class="param">year</span>&amp;<span class="param">region_code</span></span>
+                <span class="endpoint-desc">Get regional age group breakdown (&#60;15, 15-64, 65+)</span>
               </div>
+            </div>
+          </div>
+
+          <!-- Region Details -->
+          <div class="category">
+            <div class="category-header">
+              <span class="category-icon">🗺️</span>
+              <span>Region Details</span>
+              <span class="category-count">1 endpoint</span>
+            </div>
+            <div class="endpoints">
               <div class="endpoint">
                 <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getMunEmployees</span>
-                <span class="endpoint-desc">Get all municipal employees data</span>
+                <span class="endpoint-path">/api/regiondetails?<span class="param">year</span>&amp;<span class="param">region_code</span></span>
+                <span class="endpoint-desc">Get regional per-age population data by year and region</span>
               </div>
+            </div>
+          </div>
+
+          <!-- Life Data -->
+          <div class="category">
+            <div class="category-header">
+              <span class="category-icon">❤️</span>
+              <span>Life Data</span>
+              <span class="category-count">1 endpoint</span>
+            </div>
+            <div class="endpoints">
               <div class="endpoint">
                 <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getMunEmployed</span>
-                <span class="endpoint-desc">Get all municipal employed data</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getMunResale</span>
-                <span class="endpoint-desc">Get all municipal resale data</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getMunInvestment</span>
-                <span class="endpoint-desc">Get all municipal investment data</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getMunProdVal</span>
-                <span class="endpoint-desc">Get all municipal production value</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getMunPurchases</span>
-                <span class="endpoint-desc">Get all municipal purchases data</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getMunRemuneration</span>
-                <span class="endpoint-desc">Get all municipal remuneration data</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getMunCosts</span>
-                <span class="endpoint-desc">Get all municipal costs data</span>
-              </div>
-              <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-path">/api/getMunIntConsumption</span>
-                <span class="endpoint-desc">Get municipal intermediate consumption</span>
+                <span class="endpoint-path">/api/lifedata/by-year?<span class="param">year</span></span>
+                <span class="endpoint-desc">Get life expectancy data by year</span>
               </div>
             </div>
           </div>
@@ -507,9 +390,9 @@ router.get("/", async (req, res) => {
       </div>
 
       <footer>
-        <p>© ${currentYear} GeoMap API · Built with ❤️ using Express.js</p>
+        <p>© ${currentYear} Demography API · Built with ❤️ using Express.js</p>
         <p style="margin-top: 8px;">
-          <a href="https://github.com/nikolozi2001/geomap-api" target="_blank">GitHub Repository</a>
+          <a href="https://github.com/nikolozi2001/demograpy-api" target="_blank">GitHub Repository</a>
         </p>
       </footer>
     </body>

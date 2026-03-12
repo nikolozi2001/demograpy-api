@@ -173,70 +173,73 @@ exports.getAgeGroupsByYearAndAges = async (req, res) => {
 
     if (!year || !age) {
       return res.status(400).json({
-        error: { message: "Year and Age parameters are required", status: 400 }
+        error: { message: "Year and Age parameters are required", status: 400 },
       });
     }
 
-    // 1. ვიღებთ წლის მთლიან მოსახლეობას პროცენტის გამოსათვლელად
-    const yearQuery = `SELECT [total] FROM [pyramid].[pyramid].[years] WHERE [year] = ?`;
-    const [yearResults] = await db.query(yearQuery, [year]);
-    
+    // 1. ვიღებთ წლის მთლიან მოსახლეობას (პროცენტისთვის)
+    const [yearResults] = await db.query(
+      `SELECT [Id], [total] FROM [pyramid].[pyramid].[years] WHERE [year] = ?`,
+      [year],
+    );
+
     if (!yearResults || yearResults.length === 0) {
       return res.status(404).json({ error: { message: "Year not found" } });
     }
     const grandTotal = yearResults[0].total;
+    const yearId = yearResults[0].Id;
 
-    // 2. ვამუშავებთ ასაკობრივ ჯგუფებს
-    const ageList = age.split(",");
-    const placeholders = ageList.map(() => "?").join(",");
+    // 2. ვიღებთ ამ წლის ყველა ასაკობრივ დეტალს ერთხელ (ბაზაზე ბევრი მოთხოვნა რომ არ წავიდეს)
+    const [allDetails] = await db.query(
+      `SELECT age, total, male, female FROM [pyramid].[pyramid].[yeardetails] WHERE yearId = ?`,
+      [yearId],
+    );
 
-    // ვიყენებთ yd. პრეფიქსს, რომ თავიდან ავიცილოთ "Ambiguous column name"
-    const query = `
-      SELECT 
-        yd.age, 
-        yd.total, 
-        yd.male, 
-        yd.female
-      FROM [pyramid].[pyramid].[yeardetails] yd
-      JOIN [pyramid].[pyramid].[years] y ON y.Id = yd.yearId
-      WHERE y.[year] = ? AND yd.age IN (${placeholders})
-    `;
+    // 3. ვყოფთ პარამეტრს ჯგუფებად (მაგ: "35+;15-34;<15")
+    const groupDefinitions = age.split(";");
 
-    const [rows] = await db.query(query, [year, ...ageList]);
+    const results = groupDefinitions.map((groupStr) => {
+      const ageList = groupStr.split(",");
 
-    if (!rows || rows.length === 0) {
-      return res.status(404).json({ error: { message: "No data found for selected ages" } });
-    }
+      // ვფილტრავთ წამოღებულ მონაცემებს ამ კონკრეტული ჯგუფისთვის
+      const filteredRows = allDetails.filter((d) =>
+        ageList.includes(String(d.age)),
+      );
 
-    // 3. დაჯამება
-    const summary = rows.reduce((acc, row) => {
-      acc.total += Number(row.total);
-      acc.male += Number(row.male);
-      acc.female += Number(row.female);
-      return acc;
-    }, { total: 0, male: 0, female: 0 });
+      const sum = filteredRows.reduce(
+        (acc, row) => {
+          acc.t += Number(row.total);
+          acc.m += Number(row.male);
+          acc.f += Number(row.female);
+          return acc;
+        },
+        { t: 0, m: 0, f: 0 },
+      );
 
-    // 4. გამოთვლები (ზუსტად ისე, როგორც თქვენს pyramid.js-შია)
-    const million = +(summary.total / 1000000).toFixed(2);
-    const percent = +((summary.total / grandTotal) * 100).toFixed(2);
-    const sexRatio = summary.female ? +((summary.male / summary.female) * 100).toFixed(2) : 0;
+      // ვიზუალური ლეიბლის შექმნა (მაგ: "15 - 34")
+      const label =
+        ageList.length > 1
+          ? `${ageList[0]} - ${ageList[ageList.length - 1]}`
+          : groupStr;
+
+      return {
+        age_group: label,
+        million: +(sum.t / 1000000).toFixed(2),
+        percent: grandTotal ? +((sum.t / grandTotal) * 100).toFixed(2) : 0,
+        sex_ratio: sum.f ? +((sum.m / sum.f) * 100).toFixed(2) : 0,
+        total: sum.t,
+        male: sum.m,
+        female: sum.f,
+      };
+    });
 
     res.json({
       year: Number(year),
-      year_total: grandTotal,
-      label: age.includes(',') ? `${ageList[0]} - ${ageList[ageList.length-1]}` : age,
-      million: million,
-      percent: percent,
-      sex_ratio: sexRatio,
-      counts: {
-        total: summary.total,
-        male: summary.male,
-        female: summary.female
-      }
+      total_population: grandTotal,
+      results: results, // აქ იქნება სამივე ჯგუფის მასივი
     });
-
   } catch (err) {
     console.error("Error:", err.message);
-    res.status(500).json({ error: { message: err.message, status: 500 } });
+    res.status(500).json({ error: { message: "Internal Server Error" } });
   }
 };

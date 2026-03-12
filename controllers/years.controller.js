@@ -169,18 +169,34 @@ exports.getAgeGroupsByYear = async (req, res) => {
 
 exports.getAgeGroupsByYearAndAges = async (req, res) => {
   try {
-    const { year, age } = req.query;
+    let { year, age } = req.query;
 
     if (!year || !age) {
       return res.status(400).json({
-        error: { message: "Year and Age parameters are required", status: 400 },
+        error: { message: "Year and Age parameters are required", status: 400 }
       });
     }
 
-    // 1. ვიღებთ წლის მთლიან მოსახლეობას (პროცენტისთვის)
+    // URL-ში + ნიშანი ხშირად გარდაიქმნება ჰარად, ამიტომ ვასწორებთ
+    age = age.replace(/ /g, '+');
+
+    // 1. ერთიანი რუკა ყველა შესაძლო ჯგუფისთვის
+    const ageGroupsMap = {
+      // პირველი ვარიანტი
+      "35+": ['35-39','40-44','45-49','50-54','55-59','60-64','65-69','70-74','75-79','80-84','85+'],
+      "15-34": ['15-19','20-24','25-29','30-34'],
+      "<15": ['0','1-4','5-9','10-14'],
+
+      // მეორე ვარიანტი
+      "50+": ['50-54','55-59','60-64','65-69','70-74','75-79','80-84','85+'],
+      "20-49": ['20-24','25-29','30-34','35-39','40-44','45-49'],
+      "<20": ['0','1-4','5-9','10-14','15-19']
+    };
+
+    // 2. ვიღებთ წლის მთლიან მოსახლეობას
     const [yearResults] = await db.query(
-      `SELECT [Id], [total] FROM [pyramid].[pyramid].[years] WHERE [year] = ?`,
-      [year],
+      `SELECT [Id], [total] FROM [pyramid].[pyramid].[years] WHERE [year] = ?`, 
+      [year]
     );
 
     if (!yearResults || yearResults.length === 0) {
@@ -189,55 +205,46 @@ exports.getAgeGroupsByYearAndAges = async (req, res) => {
     const grandTotal = yearResults[0].total;
     const yearId = yearResults[0].Id;
 
-    // 2. ვიღებთ ამ წლის ყველა ასაკობრივ დეტალს ერთხელ (ბაზაზე ბევრი მოთხოვნა რომ არ წავიდეს)
+    // 3. ვიღებთ წლის ყველა დეტალს
     const [allDetails] = await db.query(
       `SELECT age, total, male, female FROM [pyramid].[pyramid].[yeardetails] WHERE yearId = ?`,
-      [yearId],
+      [yearId]
     );
 
-    // 3. ვყოფთ პარამეტრს ჯგუფებად (მაგ: "35+;15-34;<15")
-    const groupDefinitions = age.split(";");
+    // 4. ვამუშავებთ მოთხოვნილ ჯგუფებს
+    const requestedGroups = age.split(','); 
+    
+    const results = requestedGroups.map(groupKey => {
+      // ვასუფთავებთ groupKey-ს ზედმეტი ჰარებისგან
+      const cleanKey = groupKey.trim();
+      const targetAges = ageGroupsMap[cleanKey] || [cleanKey];
+      
+      const filteredRows = allDetails.filter(d => targetAges.includes(String(d.age)));
 
-    const results = groupDefinitions.map((groupStr) => {
-      const ageList = groupStr.split(",");
-
-      // ვფილტრავთ წამოღებულ მონაცემებს ამ კონკრეტული ჯგუფისთვის
-      const filteredRows = allDetails.filter((d) =>
-        ageList.includes(String(d.age)),
-      );
-
-      const sum = filteredRows.reduce(
-        (acc, row) => {
-          acc.t += Number(row.total);
-          acc.m += Number(row.male);
-          acc.f += Number(row.female);
-          return acc;
-        },
-        { t: 0, m: 0, f: 0 },
-      );
-
-      // ვიზუალური ლეიბლის შექმნა (მაგ: "15 - 34")
-      const label =
-        ageList.length > 1
-          ? `${ageList[0]} - ${ageList[ageList.length - 1]}`
-          : groupStr;
+      const sum = filteredRows.reduce((acc, row) => {
+        acc.t += Number(row.total);
+        acc.m += Number(row.male);
+        acc.f += Number(row.female);
+        return acc;
+      }, { t: 0, m: 0, f: 0 });
 
       return {
-        age_group: label,
+        age_group: cleanKey,
         million: +(sum.t / 1000000).toFixed(2),
         percent: grandTotal ? +((sum.t / grandTotal) * 100).toFixed(2) : 0,
         sex_ratio: sum.f ? +((sum.m / sum.f) * 100).toFixed(2) : 0,
         total: sum.t,
         male: sum.m,
-        female: sum.f,
+        female: sum.f
       };
     });
 
     res.json({
       year: Number(year),
       total_population: grandTotal,
-      results: results, // აქ იქნება სამივე ჯგუფის მასივი
+      results: results
     });
+
   } catch (err) {
     console.error("Error:", err.message);
     res.status(500).json({ error: { message: "Internal Server Error" } });

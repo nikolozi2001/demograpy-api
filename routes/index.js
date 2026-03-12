@@ -236,7 +236,7 @@ router.get("/", async (req, res) => {
     <body>
       <div class="header">
         <div class="header-left">
-          <span class="logo">�</span>
+          <img src="https://www.geostat.ge/img/logo.svg" alt="Geostat Logo" style="height: 40px;">
           <h1>Demography API</h1>
         </div>
         <span class="version">v1.0.0</span>
@@ -297,7 +297,7 @@ router.get("/", async (req, res) => {
               <div class="endpoint">
                 <span class="method method-get">GET</span>
                 <span class="endpoint-path">/api/years/age-details?<span class="param">year</span>&amp;<span class="param">age</span></span>
-                <span class="endpoint-desc">Get detailed age-specific data (optional age filter)</span>
+                <span class="endpoint-desc">Dynamic age grouping: splits all population into 3 groups based on selected ages (e.g. age=15-19,20-24,25-29 → &lt;15, 15-29, 30+)</span>
               </div>
             </div>
           </div>
@@ -328,7 +328,7 @@ router.get("/", async (req, res) => {
             <div class="category-header">
               <span class="category-icon">🏛️</span>
               <span>Region Years</span>
-              <span class="category-count">2 endpoints</span>
+              <span class="category-count">3 endpoints</span>
             </div>
             <div class="endpoints">
               <div class="endpoint">
@@ -340,6 +340,11 @@ router.get("/", async (req, res) => {
                 <span class="method method-get">GET</span>
                 <span class="endpoint-path">/api/regionyears/age-groups?<span class="param">year</span>&amp;<span class="param">region_code</span></span>
                 <span class="endpoint-desc">Get regional age group breakdown (&#60;15, 15-64, 65+)</span>
+              </div>
+              <div class="endpoint">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-path">/api/regionyears/age-details?<span class="param">year</span>&amp;<span class="param">region_code</span>&amp;<span class="param">age</span></span>
+                <span class="endpoint-desc">Dynamic regional age grouping: splits all region population into 3 groups based on selected ages</span>
               </div>
             </div>
           </div>

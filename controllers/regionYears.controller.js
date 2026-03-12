@@ -185,3 +185,152 @@ exports.getAgeGroupsByYear = async (req, res) => {
     });
   }
 };
+
+exports.getAgeGroupsByYearAndAges = async (req, res) => {
+  try {
+    let { year, age, region_code } = req.query;
+
+    if (!year || !age || !region_code) {
+      return res.status(400).json({
+        error: { message: "Year, Age and region_code parameters are required", status: 400 }
+      });
+    }
+
+    // URL-ში + ნიშანი ხშირად გარდაიქმნება ჰარად, ამიტომ ვასწორებთ
+    age = age.replace(/ /g, '+');
+
+    // ყველა შესაძლო age range სწორი თანმიმდევრობით
+    const allAgeRanges = [
+      '0', '1-4', '5-9', '10-14', '15-19', '20-24', '25-29',
+      '30-34', '35-39', '40-44', '45-49', '50-54', '55-59',
+      '60-64', '65-69', '70-74', '75-79', '80-84', '85+'
+    ];
+
+    // თითოეული age range-ის რიცხვითი საზღვრები (ლეიბლებისთვის)
+    const ageBounds = {
+      '0': [0, 0], '1-4': [1, 4], '5-9': [5, 9], '10-14': [10, 14],
+      '15-19': [15, 19], '20-24': [20, 24], '25-29': [25, 29], '30-34': [30, 34],
+      '35-39': [35, 39], '40-44': [40, 44], '45-49': [45, 49], '50-54': [50, 54],
+      '55-59': [55, 59], '60-64': [60, 64], '65-69': [65, 69], '70-74': [70, 74],
+      '75-79': [75, 79], '80-84': [80, 84], '85+': [85, 999]
+    };
+
+    // მოთხოვნილი ასაკობრივი ჯგუფები
+    const selectedAges = age.split(',').map(a => a.trim());
+
+    // ვიპოვოთ არჩეული ასაკების ინდექსები allAgeRanges მასივში
+    const selectedIndices = selectedAges
+      .map(a => allAgeRanges.indexOf(a))
+      .filter(i => i !== -1)
+      .sort((a, b) => a - b);
+
+    if (selectedIndices.length === 0) {
+      return res.status(400).json({
+        error: { message: "Invalid age values provided", status: 400 }
+      });
+    }
+
+    const minIndex = selectedIndices[0];
+    const maxIndex = selectedIndices[selectedIndices.length - 1];
+
+    // სამი ჯგუფის ავტომატური განსაზღვრა
+    const belowAges = allAgeRanges.slice(0, minIndex);
+    const middleAges = allAgeRanges.slice(minIndex, maxIndex + 1);
+    const aboveAges = allAgeRanges.slice(maxIndex + 1);
+
+    // დინამიური ლეიბლების გენერაცია
+    const minAge = ageBounds[allAgeRanges[minIndex]][0];
+    const maxAgeRange = allAgeRanges[maxIndex];
+    const maxAge = maxAgeRange === '85+' ? '85+' : ageBounds[maxAgeRange][1];
+
+    const belowLabel = minAge === 0 ? "< 0" : `< ${minAge}`;
+    const middleLabel = maxAge === '85+' ? `${minAge} +` : `${minAge} - ${maxAge}`;
+    const aboveLabel = maxAge === '85+' ? null : `${Number(maxAge) + 1} +`;
+
+    // რეგიონის მთლიანი მოსახლეობის წამოღება
+    const [regionResults] = await db.query(
+      `SELECT [total] FROM [pyramid].[pyramid].[regionyears] WHERE [year] = ? AND [region_code] = ?`,
+      [year, region_code]
+    );
+
+    if (!regionResults || regionResults.length === 0) {
+      return res.status(404).json({ error: { message: `No data found for year ${year} and region ${region_code}` } });
+    }
+    const grandTotal = regionResults[0].total;
+
+    // ყველა age detail წამოღება რეგიონისთვის
+    const [allDetails] = await db.query(
+      `SELECT age, total, male, female FROM [pyramid].[pyramid].[regiondetails] WHERE [year] = ? AND [region_code] = ?`,
+      [year, region_code]
+    );
+
+    // ჯგუფის აგრეგაცია
+    const sumGroup = (ageList) => {
+      return allDetails
+        .filter(d => ageList.includes(String(d.age)))
+        .reduce((acc, row) => {
+          acc.total += Number(row.total);
+          acc.male += Number(row.male);
+          acc.female += Number(row.female);
+          return acc;
+        }, { total: 0, male: 0, female: 0 });
+    };
+
+    const belowSum = sumGroup(belowAges);
+    const middleSum = sumGroup(middleAges);
+    const aboveSum = sumGroup(aboveAges);
+
+    const sexRatio = (m, f) => (f ? +((m / f) * 100).toFixed(2) : 0);
+    const inMillions = (v) => +(v / 1000000).toFixed(2);
+    const pct = (v) => (grandTotal ? +((v / grandTotal) * 100).toFixed(2) : 0);
+
+    // შედეგის ფორმირება
+    const results = [];
+
+    // ზემოთ ჯგუფი (ყველაზე დიდი ასაკი პირველი)
+    if (aboveLabel) {
+      results.push({
+        age_group: aboveLabel,
+        million: inMillions(aboveSum.total),
+        percent: pct(aboveSum.total),
+        sex_ratio: aboveSum.female > 0 ? sexRatio(aboveSum.male, aboveSum.female) : 0,
+        total: aboveSum.total,
+        male: aboveSum.male,
+        female: aboveSum.female
+      });
+    }
+
+    // არჩეული ჯგუფი (შუა)
+    results.push({
+      age_group: middleLabel,
+      million: inMillions(middleSum.total),
+      percent: pct(middleSum.total),
+      sex_ratio: sexRatio(middleSum.male, middleSum.female),
+      total: middleSum.total,
+      male: middleSum.male,
+      female: middleSum.female
+    });
+
+    // ქვემოთ ჯგუფი (ყველაზე პატარა ასაკი ბოლოს)
+    results.push({
+      age_group: belowLabel,
+      million: inMillions(belowSum.total),
+      percent: pct(belowSum.total),
+      sex_ratio: belowSum.female > 0 ? sexRatio(belowSum.male, belowSum.female) : 0,
+      total: belowSum.total,
+      male: belowSum.male,
+      female: belowSum.female
+    });
+
+    res.json({
+      year: Number(year),
+      region_code,
+      total_population: grandTotal,
+      results: results
+    });
+
+  } catch (err) {
+    console.error("Error:", err.message);
+    res.status(500).json({ error: { message: "Internal Server Error" } });
+  }
+};

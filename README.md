@@ -62,50 +62,59 @@ Response:
 }
 ```
 
-### Get Age-Specific Details
+### Get Dynamic Age Group Details (National)
+The `age-details` endpoint dynamically groups ALL population data into three categories based on your selected ages:
 ```sh
-# Get grouped data for ages 0-14 (default without age param)
-curl "http://localhost:5000/api/years/age-details?year=2025"
+# Ages 15-29 selected → groups: "< 15", "15 - 29", "30 +"
+curl "http://localhost:5000/api/years/age-details?year=2025&age=15-19,20-24,25-29"
 
-# Get grouped data for specific ages (0, 1-4, 5-9, 10-14)
-curl "http://localhost:5000/api/years/age-details?year=2025&age=0,1-4,5-9,10-14"
+# Ages 5-24 selected → groups: "< 5", "5 - 24", "25 +"
+curl "http://localhost:5000/api/years/age-details?year=2025&age=5-9,10-14,15-19,20-24"
+
+# Ages 20-49 selected → groups: "< 20", "20 - 49", "50 +"
+curl "http://localhost:5000/api/years/age-details?year=2025&age=20-24,25-29,30-34,35-39,40-44,45-49"
 ```
 Response:
 ```json
 {
   "year": 2025,
-  "ages": ["0", "1-4", "5-9", "10-14"],
-  "totals": {
-    "total": 3704506,
-    "million": 3.70
-  },
-  "groups": {
-    "< 0": {
-      "total": 0,
-      "male": 0,
-      "female": 0,
-      "million": 0.00,
-      "percent": 0.00,
-      "sex_ratio": NaN
+  "total_population": 3704506,
+  "results": [
+    {
+      "age_group": "30 +",
+      "million": 2.34,
+      "percent": 63.26,
+      "sex_ratio": 84.22,
+      "total": 2344812,
+      "male": 1069123,
+      "female": 1275689
     },
-    "0 - 14": {
-      "total": 712511,
-      "male": 369532,
-      "female": 342979,
+    {
+      "age_group": "15 - 29",
+      "million": 0.65,
+      "percent": 17.51,
+      "sex_ratio": 109.99,
+      "total": 648876,
+      "male": 340123,
+      "female": 308753
+    },
+    {
+      "age_group": "< 15",
       "million": 0.71,
       "percent": 19.23,
-      "sex_ratio": 107.74
-    },
-    "15 +": {
-      "total": 2991995,
-      "male": 1411043,
-      "female": 1580952,
-      "million": 2.99,
-      "percent": 80.77,
-      "sex_ratio": 89.25
+      "sex_ratio": 107.74,
+      "total": 710818,
+      "male": 369329,
+      "female": 341489
     }
-  }
+  ]
 }
+```
+
+### Get Dynamic Age Group Details (Regional)
+```sh
+curl "http://localhost:5000/api/regionyears/age-details?year=2025&region_code=GE-TB&age=15-19,20-24,25-29"
+```
 ```
 
 ### Get Regional Data
@@ -131,7 +140,7 @@ Response:
 ### Years (National)
 - **GET** `/api/years/by-year?year=YYYY` — Get national summary data by year (total, male, female, median age, life expectancy, fertility rate, etc.)
 - **GET** `/api/years/age-groups?year=YYYY` — Get national age group breakdown (<15, 15-64, 65+) with dependency ratios
-- **GET** `/api/years/age-details?year=YYYY&age=AGES` — Get detailed age-specific data with optional age filter (comma-separated ages: 0,1-4,5-9, etc.)
+- **GET** `/api/years/age-details?year=YYYY&age=AGES` — Dynamic age grouping: splits ALL population into 3 groups based on selected ages (below, selected, above). Example: `age=15-19,20-24,25-29` → groups "< 15", "15 - 29", "30 +"
 
 ### Year Details
 - **GET** `/api/yeardetails/by-year?year=YYYY` — Get national per-age population data by year
@@ -140,6 +149,7 @@ Response:
 ### Region Years
 - **GET** `/api/regionyears?year=YYYY&region_code=CODE` — Get regional summary data by year and region
 - **GET** `/api/regionyears/age-groups?year=YYYY&region_code=CODE` — Get regional age group breakdown (<15, 15-64, 65+)
+- **GET** `/api/regionyears/age-details?year=YYYY&region_code=CODE&age=AGES` — Dynamic regional age grouping (same as national but for a specific region)
 
 ### Region Details
 - **GET** `/api/regiondetails?year=YYYY&region_code=CODE` — Get regional per-age population data by year and region

@@ -62,6 +62,52 @@ Response:
 }
 ```
 
+### Get Age-Specific Details
+```sh
+# Get grouped data for ages 0-14 (default without age param)
+curl "http://localhost:5000/api/years/age-details?year=2025"
+
+# Get grouped data for specific ages (0, 1-4, 5-9, 10-14)
+curl "http://localhost:5000/api/years/age-details?year=2025&age=0,1-4,5-9,10-14"
+```
+Response:
+```json
+{
+  "year": 2025,
+  "ages": ["0", "1-4", "5-9", "10-14"],
+  "totals": {
+    "total": 3704506,
+    "million": 3.70
+  },
+  "groups": {
+    "< 0": {
+      "total": 0,
+      "male": 0,
+      "female": 0,
+      "million": 0.00,
+      "percent": 0.00,
+      "sex_ratio": NaN
+    },
+    "0 - 14": {
+      "total": 712511,
+      "male": 369532,
+      "female": 342979,
+      "million": 0.71,
+      "percent": 19.23,
+      "sex_ratio": 107.74
+    },
+    "15 +": {
+      "total": 2991995,
+      "male": 1411043,
+      "female": 1580952,
+      "million": 2.99,
+      "percent": 80.77,
+      "sex_ratio": 89.25
+    }
+  }
+}
+```
+
 ### Get Regional Data
 ```sh
 curl "http://localhost:5000/api/regionyears?year=2024&region_code=GE-TB"
@@ -85,6 +131,7 @@ Response:
 ### Years (National)
 - **GET** `/api/years/by-year?year=YYYY` — Get national summary data by year (total, male, female, median age, life expectancy, fertility rate, etc.)
 - **GET** `/api/years/age-groups?year=YYYY` — Get national age group breakdown (<15, 15-64, 65+) with dependency ratios
+- **GET** `/api/years/age-details?year=YYYY&age=AGES` — Get detailed age-specific data with optional age filter (comma-separated ages: 0,1-4,5-9, etc.)
 
 ### Year Details
 - **GET** `/api/yeardetails/by-year?year=YYYY` — Get national per-age population data by year

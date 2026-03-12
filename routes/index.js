@@ -281,7 +281,7 @@ router.get("/", async (req, res) => {
             <div class="category-header">
               <span class="category-icon">📅</span>
               <span>Years (National)</span>
-              <span class="category-count">2 endpoints</span>
+              <span class="category-count">3 endpoints</span>
             </div>
             <div class="endpoints">
               <div class="endpoint">
@@ -293,6 +293,11 @@ router.get("/", async (req, res) => {
                 <span class="method method-get">GET</span>
                 <span class="endpoint-path">/api/years/age-groups?<span class="param">year</span></span>
                 <span class="endpoint-desc">Get national age group breakdown (&#60;15, 15-64, 65+)</span>
+              </div>
+              <div class="endpoint">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-path">/api/years/age-details?<span class="param">year</span>&amp;<span class="param">age</span></span>
+                <span class="endpoint-desc">Get detailed age-specific data (optional age filter)</span>
               </div>
             </div>
           </div>

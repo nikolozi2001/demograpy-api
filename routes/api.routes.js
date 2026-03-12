@@ -56,6 +56,11 @@ router.get("/years/by-year", handleRoute(yearsController, "getYearsByYear"));
 router.get("/years/age-groups", yearsController.getAgeGroupsByYear);
 
 router.get(
+  "/years/age-details",
+  handleRoute(yearsController, "getAgeGroupsByYearAndAges"),
+);
+
+router.get(
   "/marriages",
   handleRoute(marriagesController, "getMarriagesByYear"),
 );

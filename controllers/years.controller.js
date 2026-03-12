@@ -166,3 +166,77 @@ exports.getAgeGroupsByYear = async (req, res) => {
     });
   }
 };
+
+exports.getAgeGroupsByYearAndAges = async (req, res) => {
+  try {
+    const { year, age } = req.query;
+
+    if (!year || !age) {
+      return res.status(400).json({
+        error: { message: "Year and Age parameters are required", status: 400 }
+      });
+    }
+
+    // 1. ვიღებთ წლის მთლიან მოსახლეობას პროცენტის გამოსათვლელად
+    const yearQuery = `SELECT [total] FROM [pyramid].[pyramid].[years] WHERE [year] = ?`;
+    const [yearResults] = await db.query(yearQuery, [year]);
+    
+    if (!yearResults || yearResults.length === 0) {
+      return res.status(404).json({ error: { message: "Year not found" } });
+    }
+    const grandTotal = yearResults[0].total;
+
+    // 2. ვამუშავებთ ასაკობრივ ჯგუფებს
+    const ageList = age.split(",");
+    const placeholders = ageList.map(() => "?").join(",");
+
+    // ვიყენებთ yd. პრეფიქსს, რომ თავიდან ავიცილოთ "Ambiguous column name"
+    const query = `
+      SELECT 
+        yd.age, 
+        yd.total, 
+        yd.male, 
+        yd.female
+      FROM [pyramid].[pyramid].[yeardetails] yd
+      JOIN [pyramid].[pyramid].[years] y ON y.Id = yd.yearId
+      WHERE y.[year] = ? AND yd.age IN (${placeholders})
+    `;
+
+    const [rows] = await db.query(query, [year, ...ageList]);
+
+    if (!rows || rows.length === 0) {
+      return res.status(404).json({ error: { message: "No data found for selected ages" } });
+    }
+
+    // 3. დაჯამება
+    const summary = rows.reduce((acc, row) => {
+      acc.total += Number(row.total);
+      acc.male += Number(row.male);
+      acc.female += Number(row.female);
+      return acc;
+    }, { total: 0, male: 0, female: 0 });
+
+    // 4. გამოთვლები (ზუსტად ისე, როგორც თქვენს pyramid.js-შია)
+    const million = +(summary.total / 1000000).toFixed(2);
+    const percent = +((summary.total / grandTotal) * 100).toFixed(2);
+    const sexRatio = summary.female ? +((summary.male / summary.female) * 100).toFixed(2) : 0;
+
+    res.json({
+      year: Number(year),
+      year_total: grandTotal,
+      label: age.includes(',') ? `${ageList[0]} - ${ageList[ageList.length-1]}` : age,
+      million: million,
+      percent: percent,
+      sex_ratio: sexRatio,
+      counts: {
+        total: summary.total,
+        male: summary.male,
+        female: summary.female
+      }
+    });
+
+  } catch (err) {
+    console.error("Error:", err.message);
+    res.status(500).json({ error: { message: err.message, status: 500 } });
+  }
+};

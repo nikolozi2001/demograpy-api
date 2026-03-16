@@ -27,6 +27,16 @@ router.get(
 );
 
 router.get(
+  "/lifedata/expectancy",
+  handleRoute(lifedataController, "getLifeExpectancy"),
+);
+
+router.get(
+  "/lifedata/years",
+  handleRoute(lifedataController, "getLifeDataYears"),
+);
+
+router.get(
   "/regiondetails",
   handleRoute(regiondetailsController, "getRegionDetailsByYear"),
 );

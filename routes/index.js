@@ -370,13 +370,23 @@ router.get("/", async (req, res) => {
             <div class="category-header">
               <span class="category-icon">❤️</span>
               <span>Life Data</span>
-              <span class="category-count">1 endpoint</span>
+              <span class="category-count">3 endpoints</span>
             </div>
             <div class="endpoints">
               <div class="endpoint">
                 <span class="method method-get">GET</span>
                 <span class="endpoint-path">/api/lifedata/by-year?<span class="param">year</span></span>
-                <span class="endpoint-desc">Get life expectancy data by year</span>
+                <span class="endpoint-desc">Get full life expectancy table by year</span>
+              </div>
+              <div class="endpoint">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-path">/api/lifedata/expectancy?<span class="param">age</span>&amp;<span class="param">gender</span>&amp;<span class="param">year</span></span>
+                <span class="endpoint-desc">Calculate life expectancy for a given age &amp; gender (male / female / both)</span>
+              </div>
+              <div class="endpoint">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-path">/api/lifedata/years</span>
+                <span class="endpoint-desc">Get list of all available years in life data</span>
               </div>
             </div>
           </div>

@@ -107,7 +107,7 @@ exports.getLifeExpectancy = async (req, res) => {
     }
 
     const row = rows[0];
-    const lifeExpectancy = isBoth ? Number(row.both_age) : Number(row.life_age);
+    const lifeExpectancy = isBoth ? +Number(row.both_age).toFixed(1) : +Number(row.life_age).toFixed(1);
     const remainingYears = +(lifeExpectancy - ageNum).toFixed(1);
 
     // Build descriptive message (Georgian style)
